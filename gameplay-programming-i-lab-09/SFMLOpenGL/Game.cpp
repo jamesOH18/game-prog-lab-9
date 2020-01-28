@@ -2,7 +2,7 @@
 
 static bool flip;
 
-Game::Game() : window(VideoMode(800, 600), "OpenGL Cube VBO")
+Game::Game() : window(sf::VideoMode(800, 600), "OpenGL Cube VBO")
 {
 }
 
@@ -13,7 +13,7 @@ void Game::run()
 
 	initialize();
 
-	Event event;
+	sf::Event event;
 
 	while (isRunning) {
 
@@ -21,7 +21,7 @@ void Game::run()
 
 		while (window.pollEvent(event))
 		{
-			if (event.type == Event::Closed)
+			if (event.type == sf::Event::Closed)
 			{
 				isRunning = false;
 			}
@@ -38,44 +38,62 @@ typedef struct
 	float color[3];
 } Vertex;
 
-Vertex vertex[6];
-GLubyte triangles[6];
+Vertex vertex[8];
+GLubyte triangles[36];
 
 /* Variable to hold the VBO identifier */
 GLuint vbo[1];
 GLuint index;
 
+
+
 void Game::initialize()
 {
+	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	gluPerspective(45.0, window.getSize().x / window.getSize().y, 1.0, 500.0);
+	glMatrixMode(GL_MODELVIEW);
+	glTranslatef(0, 0, -8);
+	glEnable(GL_CULL_FACE);
+
 	isRunning = true;
 
 	glewInit();
 
 	/* Vertices counter-clockwise winding */
 
-	vertex[0].coordinate[0] = -0.5f;
-	vertex[0].coordinate[1] = -0.5f;
-	vertex[0].coordinate[2] = 0.0f;
+	vertex[0].coordinate[0] = -1.0f;
+	vertex[0].coordinate[1] = -1.0f;
+	vertex[0].coordinate[2] = 1.0f;
 
-	vertex[1].coordinate[0] = -0.5f;
-	vertex[1].coordinate[1] = 0.5f;
-	vertex[1].coordinate[2] = 0.0f;
+	vertex[1].coordinate[0] = 1.0f;
+	vertex[1].coordinate[1] = -1.0f;
+	vertex[1].coordinate[2] = 1.0f;
 
-	vertex[2].coordinate[0] = 0.5f;
-	vertex[2].coordinate[1] = 0.5f;
-	vertex[2].coordinate[2] = 0.0f;
+	vertex[2].coordinate[0] = 1.0f;
+	vertex[2].coordinate[1] = 1.0f;
+	vertex[2].coordinate[2] = 1.0f;
 
-	//vertex[3].coordinate[0] = 0.5f; 
-	//vertex[3].coordinate[1] = 0.5f;  
-	//vertex[3].coordinate[2] = 0.0f;
+	vertex[3].coordinate[0] = -1.0f; 
+	vertex[3].coordinate[1] = 1.0f;  
+	vertex[3].coordinate[2] = 1.0f;
 
-	//vertex[4].coordinate[0] = 0.5f; 
-	//vertex[4].coordinate[1] = -0.5f;  
-	//vertex[4].coordinate[2] = 0.0f;
+	vertex[4].coordinate[0] = -1.0f; 
+	vertex[4].coordinate[1] = -1.0f;  
+	vertex[4].coordinate[2] = -1.0f;
 
-	//vertex[5].coordinate[0] = -0.5f; 
-	//vertex[5].coordinate[1] = -0.5f;  
-	//vertex[5].coordinate[2] = 0.0f;
+	vertex[5].coordinate[0] = 1.0f; 
+	vertex[5].coordinate[1] = -1.0f;  
+	vertex[5].coordinate[2] = -1.0f;
+
+	vertex[6].coordinate[0] = 1.0f;
+	vertex[6].coordinate[1] = 1.0f;
+	vertex[6].coordinate[2] = -1.0f;
+
+	vertex[7].coordinate[0] = -1.0f;
+	vertex[7].coordinate[1] = 1.0f;
+	vertex[7].coordinate[2] = -1.0f;
 
 	vertex[0].color[0] = 0.1f;
 	vertex[0].color[1] = 1.0f;
@@ -101,10 +119,26 @@ void Game::initialize()
 	vertex[5].color[1] = 1.0f;
 	vertex[5].color[2] = 0.0f;
 
+	vertex[6].color[0] = 0.6f;
+	vertex[6].color[1] = 0.0f;
+	vertex[6].color[2] = 1.0f;
+
+	vertex[7].color[0] = 0.6f;
+	vertex[7].color[1] = 0.0f;
+	vertex[7].color[2] = 1.0f;
 
 	triangles[0] = 0;   triangles[1] = 1;   triangles[2] = 2;
-	triangles[3] = 3;   triangles[4] = 4;   triangles[5] = 5;
-
+	triangles[3] = 2;   triangles[4] = 3;   triangles[5] = 0;
+	triangles[6] = 5;   triangles[7] = 1;   triangles[8] = 0;
+	triangles[9] = 0;   triangles[10] = 4;   triangles[11] = 5;
+	triangles[12] = 1;   triangles[13] = 5;   triangles[14] = 6;
+	triangles[15] = 6;   triangles[16] = 2;   triangles[17] = 1;
+	triangles[18] = 3;   triangles[19] = 2;   triangles[20] = 6;
+	triangles[21] = 6;   triangles[22] = 7;   triangles[23] = 3;
+	triangles[24] = 4;   triangles[25] = 0;   triangles[23] = 3;
+	triangles[27] = 3;   triangles[28] = 7;   triangles[29] = 4;
+	triangles[30] = 6;   triangles[31] = 5;   triangles[32] = 4;
+	triangles[33] = 4;   triangles[34] = 7;   triangles[35] = 6;
 	/* Create a new VBO using VBO id */
 	glGenBuffers(1, vbo);
 
@@ -112,45 +146,70 @@ void Game::initialize()
 	glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
 
 	/* Upload vertex data to GPU */
-	glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * 6, vertex, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * 36, vertex, GL_STATIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	glGenBuffers(1, &index);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, index);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLubyte) * 6, triangles, GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLubyte) * 36, triangles, GL_STATIC_DRAW);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	
 }
 
 void Game::update()
 {
 	elapsed = clock.getElapsedTime();
 
-	if (elapsed.asSeconds() >= 1.0f)
+	if (elapsed.asSeconds() >= 1.0f/60.0f)
 	{
 		clock.restart();
-
-		if (!flip)
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Z))
 		{
-			flip = true;
+			for (int i = 0; i < 8; i++)
+			{
+
+				vector.x = vertex[i];
+				vector.y = vertices[i + 1];
+				vector.z = vertices[i + 2];
+				vector = matrix.rotationZ(0.01) * vector;
+				vertices[i + 2] = vector.z;
+				vertices[i] = vector.x;
+				vertices[i + 1] = vector.y;
+			}
 		}
-		else
-			flip = false;
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Y))
+		{
+			for (int i = 0; i < 24; i += 3)
+			{
+
+				vector.x = vertices[i];
+				vector.y = vertices[i + 1];
+				vector.z = vertices[i + 2];
+				vector = matrix.rotationY(0.01) * vector;
+				vertices[i + 1] = vector.y;
+				vertices[i + 2] = vector.z;
+				vertices[i] = vector.x;
+			}
+		}
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::X))
+		{
+			for (int i = 0; i < 24; i += 3)
+			{
+				vector.x = vertices[i];
+				vector.y = vertices[i + 1];
+				vector.z = vertices[i + 2];
+				vector = matrix.rotationX(0.01) * vector;
+				vertices[i] = vector.x;
+				vertices[i + 2] = vector.z;
+				vertices[i + 1] = vector.y;
+			}
+		}
+		
 	}
 
-	if (flip)
-	{
-		rotationAngle += 0.005f;
+	
 
-		if (rotationAngle > 360.0f)
-		{
-			rotationAngle -= 360.0f;
-		}
-	}
 
-	//Change vertex data
-	vertex[0].coordinate[0] += -0.0001f;
-	vertex[0].coordinate[1] += -0.0001f;
-	vertex[0].coordinate[2] += -0.0001f;
 
 	cout << "Update up" << endl;
 }
@@ -168,7 +227,7 @@ void Game::render()
 
 	/*	As the data positions will be updated by the this program on the
 		CPU bind the updated data to the GPU for drawing	*/
-	glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * 6, vertex, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * 36, vertex, GL_STATIC_DRAW);
 
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glEnableClientState(GL_COLOR_ARRAY);
@@ -179,7 +238,7 @@ void Game::render()
 	/*	Draw Triangle from VBO	(set where to start from as VBO can contain 
 		model compoents that are and are not to be drawn )	*/
 	glVertexPointer(3, GL_FLOAT, sizeof(Vertex), (char*)NULL + 0);
-	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, (char*)NULL + 0);
+	glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_BYTE, (char*)NULL + 0);
 
 	glDisableClientState(GL_VERTEX_ARRAY);
 	glDisableClientState(GL_COLOR_ARRAY);
