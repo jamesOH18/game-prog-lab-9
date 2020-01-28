@@ -99,8 +99,8 @@ void Game::initialize()
 	vertex[0].color[1] = 1.0f;
 	vertex[0].color[2] = 0.0f;
 
-	vertex[1].color[0] = 0.2f;
-	vertex[1].color[1] = 1.0f;
+	vertex[1].color[0] = 1.0f;
+	vertex[1].color[1] = 0.0f;
 	vertex[1].color[2] = 0.0f;
 
 	vertex[2].color[0] = 0.3f;
@@ -135,7 +135,7 @@ void Game::initialize()
 	triangles[15] = 6;   triangles[16] = 2;   triangles[17] = 1;
 	triangles[18] = 3;   triangles[19] = 2;   triangles[20] = 6;
 	triangles[21] = 6;   triangles[22] = 7;   triangles[23] = 3;
-	triangles[24] = 4;   triangles[25] = 0;   triangles[23] = 3;
+	triangles[24] = 4;   triangles[25] = 0;   triangles[26] = 3;
 	triangles[27] = 3;   triangles[28] = 7;   triangles[29] = 4;
 	triangles[30] = 6;   triangles[31] = 5;   triangles[32] = 4;
 	triangles[33] = 4;   triangles[34] = 7;   triangles[35] = 6;
@@ -168,43 +168,87 @@ void Game::update()
 			for (int i = 0; i < 8; i++)
 			{
 
-				vector.x = vertex[i];
-				vector.y = vertices[i + 1];
-				vector.z = vertices[i + 2];
+				vector.x = vertex[i].coordinate[0];
+				vector.y = vertex[i].coordinate[1];
+				vector.z = vertex[i].coordinate[2];
 				vector = matrix.rotationZ(0.01) * vector;
-				vertices[i + 2] = vector.z;
-				vertices[i] = vector.x;
-				vertices[i + 1] = vector.y;
+				vertex[i].coordinate[0]=vector.x;
+				vertex[i].coordinate[1] = vector.y;
+				vertex[i].coordinate[2] = vector.z;
 			}
 		}
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Y))
 		{
-			for (int i = 0; i < 24; i += 3)
+			for (int i = 0; i < 8; i++)
 			{
 
-				vector.x = vertices[i];
-				vector.y = vertices[i + 1];
-				vector.z = vertices[i + 2];
+
+				vector.x = vertex[i].coordinate[0];
+				vector.y = vertex[i].coordinate[1];
+				vector.z = vertex[i].coordinate[2];
 				vector = matrix.rotationY(0.01) * vector;
-				vertices[i + 1] = vector.y;
-				vertices[i + 2] = vector.z;
-				vertices[i] = vector.x;
+				vertex[i].coordinate[0] = vector.x;
+				vertex[i].coordinate[1] = vector.y;
+				vertex[i].coordinate[2] = vector.z;
 			}
 		}
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::X))
 		{
-			for (int i = 0; i < 24; i += 3)
+			for (int i = 0; i < 8; i++)
 			{
-				vector.x = vertices[i];
-				vector.y = vertices[i + 1];
-				vector.z = vertices[i + 2];
+				vector.x = vertex[i].coordinate[0];
+				vector.y = vertex[i].coordinate[1];
+				vector.z = vertex[i].coordinate[2];
 				vector = matrix.rotationX(0.01) * vector;
-				vertices[i] = vector.x;
-				vertices[i + 2] = vector.z;
-				vertices[i + 1] = vector.y;
+				vertex[i].coordinate[0] = vector.x;
+				vertex[i].coordinate[1] = vector.y;
+				vertex[i].coordinate[2] = vector.z;
 			}
 		}
-		
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::T))
+		{
+			for (int i = 0; i < 8; i ++)
+			{
+				float z = vertex[i].coordinate[2];
+				vertex[i].coordinate[2] = 1;
+				vector.x = vertex[i].coordinate[0];
+				vector.y = vertex[i].coordinate[1];
+				vector.z = vertex[i].coordinate[2];
+				vector = matrix.translation({ 0.01, 0.01, 0.0 }) * vector;
+				vertex[i].coordinate[0] = vector.x;
+				vertex[i].coordinate[1] = vector.y;
+				vertex[i].coordinate[2] = z;
+
+			}
+		}
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
+		{
+			for (int i = 0; i < 8; i++)
+			{
+				
+				vector.x = vertex[i].coordinate[0];
+				vector.y = vertex[i].coordinate[1];
+				vector.z = vertex[i].coordinate[2];
+				vector = matrix.scale(1.01) * vector;
+				vertex[i].coordinate[0] = vector.x;
+				vertex[i].coordinate[1] = vector.y;
+				vertex[i].coordinate[2] = vector.z;
+			}
+		}
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
+		{
+			for (int i = 0; i < 8; i++)
+			{
+				
+				vector.x = vertex[i].coordinate[0];
+				vector.y = vertex[i].coordinate[1];
+				vector.z = vertex[i].coordinate[2];
+				vector = matrix.scale(0.99) * vector;
+				vertex[i].coordinate[0] = vector.x;
+				vertex[i].coordinate[1] = vector.y;
+				vertex[i].coordinate[2] = vector.z;
+			}
+		}
 	}
 
 	
